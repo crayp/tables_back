@@ -9,6 +9,7 @@ import (
 	"restaurant-booking-backend/routes"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -22,7 +23,15 @@ func main() {
 	router := mux.NewRouter()
 	routes.RegisterRoutes(router)
 
+	// Настраиваем CORS
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Разрешаем все домены, измените на список разрешенных доменов при необходимости
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}).Handler(router)
+
 	// Запускаем сервер
 	log.Println("Server is running on port 8080")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", corsHandler))
 }
