@@ -28,3 +28,8 @@ CREATE TABLE IF NOT EXISTS bookings (
     user_id INT REFERENCES users(id),
     status VARCHAR(50) NOT NULL
 );
+
+ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP;
+ALTER TABLE restaurants ADD COLUMN deleted_at TIMESTAMP;
+ALTER TABLE tables ADD COLUMN deleted_at TIMESTAMP;
+ALTER TABLE bookings ADD COLUMN deleted_at TIMESTAMP;
