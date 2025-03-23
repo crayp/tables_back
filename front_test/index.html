@@ -3,25 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users</title>
+    <title>Users and Restaurants</title>
 </head>
 <body>
     <h1>Users</h1>
     <ul id="users-list"></ul>
 
+    <h2>Create User</h2>
+    <form id="user-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="user">User</option>
+            <option value="restaurant">Restaurant</option>
+        </select>
+        <br>
+        <button type="submit">Create User</button>
+    </form>
+
+    <h1>Restaurants</h1>
+    <ul id="restaurants-list"></ul>
+
+    <h2>Create Restaurant</h2>
+    <form id="restaurant-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required>
+        <br>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <br>
+        <label for="owner_id">Owner ID:</label>
+        <input type="number" id="owner_id" name="owner_id" required>
+        <br>
+        <button type="submit">Create Restaurant</button>
+    </form>
+
     <script>
-        // Fetch users from the backend
-        fetch('http://backend:8080/api/users')
-            .then(response => response.json())
-            .then(users => {
-                const usersList = document.getElementById('users-list');
-                users.forEach(user => {
-                    const li = document.createElement('li');
-                    li.textContent = `${user.username} (${user.email})`;
-                    usersList.appendChild(li);
-                });
+        // Fetch and display users
+        function fetchUsers() {
+            fetch('http://backend:8080/api/users')
+                .then(response => response.json())
+                .then(users => {
+                    const usersList = document.getElementById('users-list');
+                    usersList.innerHTML = '';
+                    users.forEach(user => {
+                        const li = document.createElement('li');
+                        li.textContent = `${user.username} (${user.email})`;
+                        usersList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error fetching users:', error));
+        }
+
+        // Fetch and display restaurants
+        function fetchRestaurants() {
+            fetch('http://backend:8080/api/restaurants')
+                .then(response => response.json())
+                .then(restaurants => {
+                    const restaurantsList = document.getElementById('restaurants-list');
+                    restaurantsList.innerHTML = '';
+                    restaurants.forEach(restaurant => {
+                        const li = document.createElement('li');
+                        li.textContent = `${restaurant.name} (${restaurant.location})`;
+                        restaurantsList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error fetching restaurants:', error));
+        }
+
+        // Handle user form submission
+        document.getElementById('user-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            };
+
+            fetch('http://backend:8080/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
             })
-            .catch(error => console.error('Error fetching users:', error));
+            .then(response => {
+                if (response.ok) {
+                    fetchUsers(); // Refresh the user list
+                    alert('User created successfully!');
+                } else {
+                    alert('Failed to create user.');
+                }
+            })
+            .catch(error => console.error('Error creating user:', error));
+        });
+
+        // Handle restaurant form submission
+        document.getElementById('restaurant-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const restaurantData = {
+                name: document.getElementById('name').value,
+                location: document.getElementById('location').value,
+                description: document.getElementById('description').value,
+                owner_id: parseInt(document.getElementById('owner_id').value, 10)
+            };
+
+            fetch('http://backend:8080/api/restaurants', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(restaurantData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    fetchRestaurants(); // Refresh the restaurant list
+                    alert('Restaurant created successfully!');
+                } else {
+                    alert('Failed to create restaurant.');
+                }
+            })
+            .catch(error => console.error('Error creating restaurant:', error));
+        });
+
+        // Initial fetch
+        fetchUsers();
+        fetchRestaurants();
     </script>
 </body>
 </html>
