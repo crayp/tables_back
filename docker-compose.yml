@@ -28,5 +28,13 @@ services:
       - db_data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
 
+  frontend:
+    build:
+      context: ./front_test
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
+
 volumes:
   db_data:
